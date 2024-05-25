@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 #[derive(Clone)]
 struct User {
     name: String,
@@ -29,7 +31,7 @@ struct Transactions {
 
 struct Net {
     user: User,
-    amount: i64,
+    amount: i32,
 }
 
 impl Transactions {
@@ -52,11 +54,33 @@ impl Transactions {
     }
 
     fn calc_net(&mut self) -> (Vec<Net>, Vec<Net>) {
-        let total_net: Vec<Net> = Vec::new();
+        let mut map: HashMap<String, i32> = HashMap::new();
 
-        let net_postive: Vec<Net> = Vec::new();
-        let net_negative: Vec<Net> = Vec::new();
-        return (net_postive, net_negative);
+        for i in &self.transactions {
+            let from = i.from.name.clone();
+            let to = i.to.name.clone();
+            let amount = i.amount.clone() as i32;
+            *map.entry(from.clone()).or_insert(0) -= amount;
+            *map.entry(to.clone()).or_insert(0) += amount;
+        }
+
+        let mut net_positive: Vec<Net> = Vec::new();
+        let mut net_negative: Vec<Net> = Vec::new();
+
+        for (name, net_amount) in map {
+            if net_amount > 0 {
+                net_positive.push(Net {
+                    user: User::create_user(&name),
+                    amount: net_amount,
+                });
+            } else if net_amount < 0 {
+                net_negative.push(Net {
+                    user: User::create_user(&name),
+                    amount: net_amount,
+                });
+            }
+        }
+        return (net_positive, net_negative);
     }
 
     fn split(positive: Vec<Net>, negative: Vec<Net>) -> Transactions {
@@ -84,4 +108,5 @@ fn main() {
     all_transactions.add(tx4);
 
     all_transactions.display();
+    let (a, b) = all_transactions.calc_net();
 }
