@@ -50,7 +50,7 @@ impl Transactions {
         for i in &self.transactions {
             println!(
                 "{0: <10} | {1: <10} | {2: <10}",
-                i.from.name, i.amount, i.to.name
+                i.from.name, i.to.name, i.amount
             );
         }
     }
@@ -93,12 +93,11 @@ impl Transactions {
             let mut pos = positive.pop().unwrap();
             let mut neg = negative.pop().unwrap();
 
-            let mut settle_amount = 0.00;
-            if settle_amount > pos.amount {
-                settle_amount = pos.amount;
+            let settle_amount = if -neg.amount > pos.amount {
+                pos.amount
             } else {
-                settle_amount = -neg.amount;
-            }
+                -neg.amount
+            };
 
             pos.amount -= settle_amount;
             neg.amount += settle_amount;
