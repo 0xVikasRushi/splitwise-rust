@@ -8,6 +8,18 @@ use split::*;
 fn main() {
     let mut all_users: Vec<User> = Vec::new();
     let mut all_transactions = Transactions::new();
+    println!(
+        "{}\n
+    ███████╗██████╗ ██╗     ██╗████████╗
+    ██╔════╝██╔══██╗██║     ██║╚══██╔══╝
+    ███████╗██████╔╝██║     ██║   ██║   
+    ╚════██║██╔═══╝ ██║     ██║   ██║   
+    ███████║██║     ███████╗██║   ██║   
+    ╚══════╝╚═╝     ╚══════╝╚═╝   ╚═╝                                       
+                                        -0xVikasRushi\n{}",
+        color::Fg(color::Blue),
+        color::Fg(color::Reset)
+    );
 
     loop {
         let options = vec![
