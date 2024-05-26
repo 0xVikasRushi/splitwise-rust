@@ -1,4 +1,4 @@
-# Splitise cli
+# Splitwise CLI in Rust 🦀
 
 ![watcher](./assets/split.png)
 It allows users to create groups, add expenses, view transactions, add new group members, and efficiently split bills among group members.
