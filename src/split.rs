@@ -2,20 +2,20 @@ use std::collections::HashMap;
 
 #[derive(Clone, PartialEq, Debug)]
 pub struct User {
-    name: String,
+    pub name: String,
 }
 
 impl User {
-    fn create_user(name: &str) -> User {
+    pub fn create_user(name: &str) -> User {
         User {
             name: String::from(name),
         }
     }
 }
 pub struct Transaction {
-    from: User,
-    to: User,
-    amount: u64,
+    pub from: User,
+    pub to: User,
+    pub amount: u64,
 }
 
 impl Transaction {
@@ -25,13 +25,13 @@ impl Transaction {
 }
 
 pub struct Transactions {
-    transactions: Vec<Transaction>,
+    pub transactions: Vec<Transaction>,
 }
 
 #[derive(Clone)]
 pub struct Net {
-    user: User,
-    amount: i32,
+    pub user: User,
+    pub amount: i32,
 }
 
 impl Transactions {
