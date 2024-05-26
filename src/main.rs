@@ -2,7 +2,7 @@ use std::process::exit;
 use termion::color;
 
 mod split;
-use inquire::{InquireError, Select, Text};
+use inquire::{InquireError, MultiSelect, Select, Text};
 use split::*;
 
 fn main() {
@@ -82,24 +82,30 @@ fn add_expense(all_users: &mut Vec<User>, all_transactions: &mut Transactions) {
                 .filter(|&name| name != selected_user)
                 .collect();
 
-            let giver_name: Result<&str, InquireError> =
-                Select::new("Please select the givers of expense:", giver_list.clone()).prompt();
+            let giver_names: Result<Vec<&str>, InquireError> =
+                MultiSelect::new("Please select the givers of expense:", giver_list.clone())
+                    .prompt();
 
-            match giver_name {
-                Ok(giver_name) => {
+            match giver_names {
+                Ok(giver_names) => {
                     let amount = Text::new("Enter the amount of expense:").prompt();
                     match amount {
                         Ok(amount) => {
-                            let amount = amount.parse::<u64>();
-                            match amount {
-                                Ok(amount) => {
-                                    let from = User::create_user(selected_user);
-                                    let to = User::create_user(giver_name);
-                                    let tx = Transaction::new(from, to, amount);
-                                    all_transactions.add(tx)
-                                }
-                                Err(_) => print_error_in_red("Amount is not valid"),
-                            };
+                            let amount = amount.parse::<f64>();
+                            let no_of_split = giver_names.len() as f64;
+
+                            for giver in giver_names.iter() {
+                                match amount {
+                                    Ok(amount) => {
+                                        let split_bill = amount / no_of_split;
+                                        let from = User::create_user(selected_user);
+                                        let to = User::create_user(giver);
+                                        let tx = Transaction::new(from, to, split_bill);
+                                        all_transactions.add(tx)
+                                    }
+                                    Err(_) => print_error_in_red("Amount is not valid"),
+                                };
+                            }
                         }
                         Err(_) => print_error_in_red("Error in entering amount"),
                     }

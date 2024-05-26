@@ -15,11 +15,11 @@ impl User {
 pub struct Transaction {
     pub from: User,
     pub to: User,
-    pub amount: u64,
+    pub amount: f64,
 }
 
 impl Transaction {
-    pub fn new(from: User, to: User, amount: u64) -> Transaction {
+    pub fn new(from: User, to: User, amount: f64) -> Transaction {
         Transaction { from, to, amount }
     }
 }
@@ -31,7 +31,7 @@ pub struct Transactions {
 #[derive(Clone)]
 pub struct Net {
     pub user: User,
-    pub amount: i32,
+    pub amount: f32,
 }
 
 impl Transactions {
@@ -56,27 +56,27 @@ impl Transactions {
     }
 
     fn calc_net(&self) -> (Vec<Net>, Vec<Net>) {
-        let mut map: HashMap<String, i32> = HashMap::new();
+        let mut map: HashMap<String, f32> = HashMap::new();
 
         for i in &self.transactions {
             let from = i.from.name.clone();
             let to = i.to.name.clone();
-            let amount = i.amount as i32;
+            let amount = i.amount as f32;
 
-            *map.entry(from.clone()).or_insert(0) -= amount;
-            *map.entry(to.clone()).or_insert(0) += amount;
+            *map.entry(from.clone()).or_insert(0.0) -= amount;
+            *map.entry(to.clone()).or_insert(0.0) += amount;
         }
 
         let mut net_positive: Vec<Net> = Vec::new();
         let mut net_negative: Vec<Net> = Vec::new();
 
         for (name, net_amount) in map {
-            if net_amount > 0 {
+            if net_amount > 0.0 {
                 net_positive.push(Net {
                     user: User::create_user(&name),
                     amount: net_amount,
                 });
-            } else if net_amount < 0 {
+            } else if net_amount < 0.0 {
                 net_negative.push(Net {
                     user: User::create_user(&name),
                     amount: net_amount,
@@ -93,7 +93,12 @@ impl Transactions {
             let mut pos = positive.pop().unwrap();
             let mut neg = negative.pop().unwrap();
 
-            let settle_amount = std::cmp::min(pos.amount, -neg.amount);
+            let mut settle_amount = 0.00;
+            if settle_amount > pos.amount {
+                settle_amount = pos.amount;
+            } else {
+                settle_amount = -neg.amount;
+            }
 
             pos.amount -= settle_amount;
             neg.amount += settle_amount;
@@ -101,13 +106,13 @@ impl Transactions {
             answer.add(Transaction::new(
                 neg.user.clone(),
                 pos.user.clone(),
-                settle_amount as u64,
+                settle_amount as f64,
             ));
 
-            if pos.amount > 0 {
+            if pos.amount > 0.0 {
                 positive.push(pos);
             }
-            if neg.amount < 0 {
+            if neg.amount < 0.0 {
                 negative.push(neg);
             }
         }
@@ -132,10 +137,10 @@ mod test {
 
         let mut all_transactions = Transactions::new();
 
-        let tx1 = Transaction::new(user1.clone(), user2.clone(), 10);
-        let tx2 = Transaction::new(user2.clone(), user1.clone(), 1);
-        let tx3 = Transaction::new(user2.clone(), user3.clone(), 5);
-        let tx4 = Transaction::new(user3.clone(), user1.clone(), 5);
+        let tx1 = Transaction::new(user1.clone(), user2.clone(), 10.0);
+        let tx2 = Transaction::new(user2.clone(), user1.clone(), 1.0);
+        let tx3 = Transaction::new(user2.clone(), user3.clone(), 5.0);
+        let tx4 = Transaction::new(user3.clone(), user1.clone(), 5.0);
 
         all_transactions.add(tx1);
         all_transactions.add(tx2);
@@ -144,7 +149,7 @@ mod test {
         println!();
 
         let settled_transactions = all_transactions.split_bill();
-        let expected_tx = Transaction::new(user1, user2, 4);
+        let expected_tx = Transaction::new(user1, user2, 4.0);
 
         assert_eq!(settled_transactions.transactions[0].from, expected_tx.from);
         assert_eq!(settled_transactions.transactions[0].to, expected_tx.to);
