@@ -15,7 +15,8 @@ fn main() {
             "2. Add Expense",
             "3. Split Bill",
             "4. View all Transactions",
-            "5. Exit",
+            "5. Add New Group Member",
+            "6. Exit",
         ];
 
         let selected_prompt: Result<&str, InquireError> =
@@ -35,7 +36,8 @@ fn handle_choice(choice: &str, all_users: &mut Vec<User>, all_transactions: &mut
         "2. Add Expense" => add_expense(all_users, all_transactions),
         "3. Split Bill" => split_bill(all_transactions),
         "4. View all Transactions" => view_all_expenses(all_transactions),
-        "5. Exit" => handle_exit(),
+        "5. Add New Group Member" => add_new_group_mem(all_users),
+        "6. Exit" => handle_exit(),
         _ => print_error_in_red("Invalid choice!"),
     }
 }
@@ -114,6 +116,17 @@ fn split_bill(all_transactions: &mut Transactions) {
     println!("Split Wise Bill ");
     let selected_tx = all_transactions.split_bill();
     selected_tx.display();
+}
+
+fn add_new_group_mem(all_users: &mut Vec<User>) {
+    let username = Text::new("Enter the new group member name:").prompt();
+    match username {
+        Ok(username) => {
+            let user = User::create_user(&username);
+            all_users.push(user);
+        }
+        Err(_) => print_error_in_red("Error in view all expenses"),
+    }
 }
 
 fn view_all_expenses(all_transactions: &mut Transactions) {
