@@ -2,6 +2,9 @@
 name = "splitwise-rust"
 version = "0.1.0"
 edition = "2021"
+authors = ["Vikas Rushi 0xvikasrushi@gmail.com"]
+repository = "https://github.com/0xvikasrushi/splitwise-rust"
+license = "MIT"
 
 [dependencies]
 inquire = "0.7.5"
