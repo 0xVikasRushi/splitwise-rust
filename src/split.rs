@@ -54,7 +54,7 @@ impl Transactions {
         }
     }
 
-    pub fn calc_net(&self) -> (Vec<Net>, Vec<Net>) {
+    fn calc_net(&self) -> (Vec<Net>, Vec<Net>) {
         let mut map: HashMap<String, i32> = HashMap::new();
 
         for i in &self.transactions {
@@ -85,7 +85,7 @@ impl Transactions {
         (net_positive, net_negative)
     }
 
-    pub fn split(positive: &mut Vec<Net>, negative: &mut Vec<Net>) -> Transactions {
+    fn split(&self, positive: &mut Vec<Net>, negative: &mut Vec<Net>) -> Transactions {
         let mut answer = Transactions::new();
 
         while !positive.is_empty() && !negative.is_empty() {
@@ -113,6 +113,11 @@ impl Transactions {
 
         answer
     }
+
+    pub fn split_bill(&self) -> Transactions {
+        let (mut pos, mut neg) = self.calc_net();
+        self.split(&mut pos, &mut neg)
+    }
 }
 
 #[cfg(test)]
@@ -137,16 +142,14 @@ mod test {
         all_transactions.add(tx4);
         println!();
 
-        let (mut pos, mut neg) = all_transactions.calc_net();
+        let settled_transactions = all_transactions.split_bill();
+        let expected_tx = Transaction::new(user1, user2, 4);
 
-        let settled_transactions = Transactions::split(&mut pos, &mut neg);
-        let expectedtx = Transaction::new(user1, user2, 4);
-
-        assert_eq!(settled_transactions.transactions[0].from, expectedtx.from);
-        assert_eq!(settled_transactions.transactions[0].to, expectedtx.to);
+        assert_eq!(settled_transactions.transactions[0].from, expected_tx.from);
+        assert_eq!(settled_transactions.transactions[0].to, expected_tx.to);
         assert_eq!(
             settled_transactions.transactions[0].amount,
-            expectedtx.amount
+            expected_tx.amount
         );
 
         println!("< --------------------SPLIT BILL OUTPUT -------------------------->");

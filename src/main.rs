@@ -103,8 +103,9 @@ fn add_expense(all_users: &mut Vec<User>, all_transaction: &mut Transactions) {
 }
 
 fn split_bill(all_transaction: &mut Transactions) {
-    all_transaction.display();
     println!("Splitting Bill...");
+    let seletted_tx = all_transaction.split_bill();
+    seletted_tx.display();
 }
 fn handle_exit() {
     println!("Exiting CLI SUI");
