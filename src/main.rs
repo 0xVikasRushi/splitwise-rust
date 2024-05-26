@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-#[derive(Clone)]
+#[derive(Clone, PartialEq, Debug)]
 struct User {
     name: String,
 }
@@ -12,7 +12,6 @@ impl User {
         }
     }
 }
-
 struct Transaction {
     from: User,
     to: User,
@@ -116,29 +115,45 @@ impl Transactions {
     }
 }
 
-fn main() {
-    let user1 = User::create_user("Alice");
-    let user2 = User::create_user("Bob");
-    let user3 = User::create_user("Charlie");
+fn main() {}
 
-    let mut all_transactions = Transactions::new();
+#[cfg(test)]
+mod test {
+    use super::*;
+    #[test]
+    fn test_basic_flow() {
+        assert_eq!(2 + 2, 4);
+        let user1 = User::create_user("Alice");
+        let user2 = User::create_user("Bob");
+        let user3 = User::create_user("Charlie");
 
-    let tx1 = Transaction::new(user1.clone(), user2.clone(), 10);
-    let tx2 = Transaction::new(user2.clone(), user1.clone(), 1);
-    let tx3 = Transaction::new(user2.clone(), user3.clone(), 5);
-    let tx4 = Transaction::new(user3.clone(), user1.clone(), 5);
+        let mut all_transactions = Transactions::new();
 
-    all_transactions.add(tx1);
-    all_transactions.add(tx2);
-    all_transactions.add(tx3);
-    all_transactions.add(tx4);
-    println!();
-    all_transactions.display();
-    println!("< --------------------SPLIT BILL OUTPUT -------------------------->");
-    println!();
+        let tx1 = Transaction::new(user1.clone(), user2.clone(), 10);
+        let tx2 = Transaction::new(user2.clone(), user1.clone(), 1);
+        let tx3 = Transaction::new(user2.clone(), user3.clone(), 5);
+        let tx4 = Transaction::new(user3.clone(), user1.clone(), 5);
 
-    let (mut pos, mut neg) = all_transactions.calc_net();
+        all_transactions.add(tx1);
+        all_transactions.add(tx2);
+        all_transactions.add(tx3);
+        all_transactions.add(tx4);
+        println!();
 
-    let settled_transactions = Transactions::split(&mut pos, &mut neg);
-    settled_transactions.display();
+        let (mut pos, mut neg) = all_transactions.calc_net();
+
+        let settled_transactions = Transactions::split(&mut pos, &mut neg);
+        let expectedtx = Transaction::new(user1, user2, 4);
+
+        assert_eq!(settled_transactions.transactions[0].from, expectedtx.from);
+        assert_eq!(settled_transactions.transactions[0].to, expectedtx.to);
+        assert_eq!(
+            settled_transactions.transactions[0].amount,
+            expectedtx.amount
+        );
+
+        println!("< --------------------SPLIT BILL OUTPUT -------------------------->");
+        println!();
+        settled_transactions.display();
+    }
 }
