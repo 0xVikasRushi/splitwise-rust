@@ -60,6 +60,7 @@ impl Transactions {
             let from = i.from.name.clone();
             let to = i.to.name.clone();
             let amount = i.amount.clone() as i32;
+
             *map.entry(from.clone()).or_insert(0) -= amount;
             *map.entry(to.clone()).or_insert(0) += amount;
         }
@@ -83,10 +84,10 @@ impl Transactions {
         return (net_positive, net_negative);
     }
 
-    fn split(positive: Vec<Net>, negative: Vec<Net>) -> Transactions {
-        let answer = Transactions::new();
-        answer
-    }
+    // fn split(positive: Vec<Net>, negative: Vec<Net>) -> Transactions {
+    //     let answer = Transactions::new();
+    //     answer
+    // }
 }
 
 fn main() {
@@ -108,5 +109,14 @@ fn main() {
     all_transactions.add(tx4);
 
     all_transactions.display();
-    let (a, b) = all_transactions.calc_net();
+    let (pos, neg) = all_transactions.calc_net();
+
+    println!("---------------------------");
+    for i in pos {
+        println!(" {} : {}", i.user.name, i.amount);
+    }
+
+    for i in neg {
+        println!(" {} : {}", i.user.name, i.amount);
+    }
 }
