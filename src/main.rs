@@ -1,4 +1,6 @@
 use std::process::exit;
+use termion::color;
+
 mod split;
 use inquire::{InquireError, Select, Text};
 use split::*;
@@ -21,7 +23,7 @@ fn main() {
 
         match selected_prompt {
             Ok(choice) => handle_choice(choice, &mut all_users, &mut all_transactions),
-            Err(_) => println!("There was an error, please try again"),
+            Err(_) => print_error_in_red("There was an error, please try again"),
         }
         println!();
     }
@@ -34,32 +36,32 @@ fn handle_choice(choice: &str, all_users: &mut Vec<User>, all_transactions: &mut
         "3. Split Bill" => split_bill(all_transactions),
         "4. View all Transactions" => view_all_expenses(all_transactions),
         "5. Exit" => handle_exit(),
-        _ => println!("Invalid choice!"),
+        _ => print_error_in_red("Invalid choice!"),
     }
 }
 
 fn create_group(all_users: &mut Vec<User>) {
     let no_of_people = Text::new("Enter the number of people:").prompt();
     match no_of_people {
-        Ok(no_of_people) => {
-            let mut no_of_people = no_of_people.parse::<u8>().unwrap();
-            if no_of_people > 0 {
-                while no_of_people > 0 {
+        Ok(no_of_people) => match no_of_people.parse::<u32>().as_mut() {
+            Ok(no_of_people) => {
+                while *no_of_people > 0 {
                     let username = Text::new("Enter the user name:").prompt();
                     match username {
                         Ok(username) => {
                             let user = User::create_user(&username);
                             all_users.push(user);
                         }
-                        Err(_) => println!("Error in creating user"),
+                        Err(_) => print_error_in_red("Error in creating user"),
                     }
-                    no_of_people -= 1;
+                    *no_of_people -= 1;
                 }
+                println!("------------------Group Created----------------------");
             }
-        }
-        Err(_) => println!("Error occurred while taking number of people"),
+            Err(_) => print_error_in_red("Please Select valid group number"),
+        },
+        Err(_) => print_error_in_red("Error occurred while taking number of people"),
     }
-    println!("------------------Group Created----------------------");
 }
 
 fn add_expense(all_users: &mut Vec<User>, all_transactions: &mut Transactions) {
@@ -86,22 +88,25 @@ fn add_expense(all_users: &mut Vec<User>, all_transactions: &mut Transactions) {
                     let amount = Text::new("Enter the amount of expense:").prompt();
                     match amount {
                         Ok(amount) => {
-                            let amount = amount.parse::<u64>().unwrap();
-                            let from = User::create_user(selected_user);
-                            let to = User::create_user(giver_name);
-
-                            let tx = Transaction::new(from, to, amount);
-                            all_transactions.add(tx);
+                            let amount = amount.parse::<u64>();
+                            match amount {
+                                Ok(amount) => {
+                                    let from = User::create_user(selected_user);
+                                    let to = User::create_user(giver_name);
+                                    let tx = Transaction::new(from, to, amount);
+                                    all_transactions.add(tx)
+                                }
+                                Err(_) => print_error_in_red("Amount is not valid"),
+                            };
                         }
-                        Err(_) => println!("Error in entering amount"),
+                        Err(_) => print_error_in_red("Error in entering amount"),
                     }
                 }
-                Err(_) => println!("Error in selecting giver"),
+                Err(_) => print_error_in_red("Error in selecting giver"),
             }
         }
-        Err(_) => println!("Error in selecting payer"),
+        Err(_) => print_error_in_red("Error in selecting payer"),
     }
-    println!("Added Expense...");
 }
 
 fn split_bill(all_transactions: &mut Transactions) {
@@ -110,11 +115,21 @@ fn split_bill(all_transactions: &mut Transactions) {
     let selected_tx = all_transactions.split_bill();
     selected_tx.display();
 }
+
 fn view_all_expenses(all_transactions: &mut Transactions) {
     all_transactions.display();
 }
 
 fn handle_exit() {
-    println!("Exiting CLI...");
+    print_error_in_red("Exiting CLI...");
     exit(0);
+}
+
+fn print_error_in_red(msg: &str) {
+    println!(
+        "{}{}{}",
+        color::Fg(color::Red),
+        msg,
+        color::Fg(color::Reset)
+    );
 }
