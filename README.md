@@ -1,4 +1,4 @@
-# Splitise cli
+# Splitwise Alternative CLI in Rust 🦀
 
 ![watcher](./assets/split.png)
 It allows users to create groups, add expenses, view transactions, add new group members, and efficiently split bills among group members.
@@ -22,6 +22,7 @@ It allows users to create groups, add expenses, view transactions, add new group
 2. Navigate to the project directory:
 
    ```bash
+
    $ cd splitwise-rust
    ```
 
@@ -55,3 +56,4 @@ cargo run
 6. **Exit**: Exit the CLI.
 
 ## Example
+<video src="https://github.com/0xVikasRushi/splitwise-rust/assets/88543171/c112bd5f-1848-4ce8-a121-4548dbacd24e" autoplay muted loop controls></video>
