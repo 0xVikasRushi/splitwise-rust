@@ -89,13 +89,8 @@ fn add_expense(all_users: &mut Vec<User>, all_transactions: &mut Transactions) {
 
     match selected_user {
         Ok(selected_user) => {
-            let giver_list: Vec<&str> = payer_list
-                .into_iter()
-                .filter(|&name| name != selected_user)
-                .collect();
-
             let giver_names: Result<Vec<&str>, InquireError> =
-                MultiSelect::new("Please select the givers of expense:", giver_list.clone())
+                MultiSelect::new("Please select the givers of expense:", payer_list.clone())
                     .prompt();
 
             match giver_names {
