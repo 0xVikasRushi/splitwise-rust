@@ -46,11 +46,11 @@ impl Transactions {
     }
 
     pub fn display(&self) {
-        println!("{0: <10} | {1: <10} | {2: <10}", "From", "To", "Amount");
+        println!("{0: <10} | {1: <10} | {2: <10}", "Who", "Owes To", "Amount");
         for i in &self.transactions {
             println!(
                 "{0: <10} | {1: <10} | {2: <10}",
-                i.from.name, i.to.name, i.amount
+                i.to.name, i.from.name, i.amount
             );
         }
     }
